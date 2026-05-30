@@ -12,7 +12,7 @@
 
 This repository contains the Google Colab companion notebooks and dataset generator for **Book 1** of the *Applied AML Analytics* series. Every code example printed in the book runs here — with real output, embedded charts, and structured exercise answer cells.
 
-No software installation is required. All notebooks run in Google Colab using only libraries that are pre-installed in the Colab environment (pandas, scikit-learn, matplotlib).
+No software installation is required. All notebooks run in Google Colab using only libraries that are pre-installed in the Colab environment (pandas, scikit-learn, matplotlib, networkx, rapidfuzz).
 
 ---
 
@@ -20,7 +20,7 @@ No software installation is required. All notebooks run in Google Colab using on
 
 Click any **Open in Colab** badge below. The notebook opens in your browser with the Northgate dataset pre-wired — run the **Section 0 setup cell** first, then work through the sections in order.
 
-Alternatively, open any notebook directly from Colab:
+Alternatively, open any notebook directly from Colab:  
 **File → Open notebook → GitHub tab → paste `ComplianceAnalytics/aml-book1`**
 
 ---
@@ -31,12 +31,13 @@ Alternatively, open any notebook directly from Colab:
 |---------|-------|---------------|
 | **3** | The Transaction Monitoring Lifecycle — first look at the Northgate dataset, mule account profile, TM lifecycle exercise | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_03.ipynb) |
 | **4** | Rule-Based TMS — implementing Rule 1 (cash threshold structuring), threshold sensitivity analysis | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_04.ipynb) |
-| **5** | Customer Segmentation — K-Means clustering on behavioural features, segment labelling exercise | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_05.ipynb) |
-| **6** | Scenario Tuning — Rule 2 (velocity), responsiveness analysis, cross-rule alert overlap | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_06.ipynb) |
-| **7** | Coverage Assessment — Rule 3 (high-risk country counterparty), three-rule coverage matrix | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_07.ipynb) |
-| **8** | ML Triage — Isolation Forest on the full alert pool, SHAP explainability, governance framework | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_08.ipynb) |
+| **5** | Entity Resolution — fuzzy name matching, multi-field record linkage, entity network construction | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_05.ipynb) |
+| **6** | Customer Segmentation — K-Means clustering on behavioural features, segment labelling exercise | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_06.ipynb) |
+| **7** | Scenario Tuning — Rule 2 (velocity), responsiveness analysis, cross-rule alert overlap | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_07.ipynb) |
+| **8** | Coverage Assessment — Rule 3 (high-risk country counterparty), three-rule coverage matrix | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_08.ipynb) |
+| **9** | ML Triage — Isolation Forest on the full alert pool, SHAP explainability, governance framework | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ComplianceAnalytics/aml-book1/blob/main/notebooks/chapter_09.ipynb) |
 
-Chapters 2, 9, and 10 do not have coding exercises and have no companion notebooks.
+Chapters 1, 2, 10, and 11 are conceptual and have no companion notebooks.
 
 ---
 
@@ -45,65 +46,70 @@ Chapters 2, 9, and 10 do not have coding exercises and have no companion noteboo
 ```
 aml-book1/
 ├── notebooks/
-│   ├── chapter_03.ipynb      ← Chapter 3 companion (this repo's template)
-│   ├── chapter_04.ipynb
-│   ├── chapter_05.ipynb
-│   ├── chapter_06.ipynb
-│   ├── chapter_07.ipynb
-│   └── chapter_08.ipynb
+│   ├── chapter_03.ipynb      ← Ch 3: TM Overview
+│   ├── chapter_04.ipynb      ← Ch 4: Scenario Design
+│   ├── chapter_05.ipynb      ← Ch 5: Entity Resolution
+│   ├── chapter_06.ipynb      ← Ch 6: Segmentation
+│   ├── chapter_07.ipynb      ← Ch 7: Tuning & Calibration
+│   ├── chapter_08.ipynb      ← Ch 8: Risk & Coverage Assessment
+│   ├── chapter_09.ipynb      ← Ch 9: ML Triage
+│   └── chapter_solutions.ipynb ← Instructor solutions manual
 ├── assets/
-│   └── cal_logo_banner.png   ← Compliance Analytics Ltd logo (displayed in notebooks)
+│   └── cal_logo_banner.png   ← Compliance Analytics Ltd logo
 └── README.md
 ```
 
-The **Northgate Retail Bank dataset** is generated inside each notebook's Section 0 setup cell. There is no separate download — the dataset is synthetic and reproducible from a fixed random seed (42). Running the setup cell in any notebook produces identical data every time.
+The **Northgate Retail Bank dataset** is generated inside each notebook's Section 0 setup cell — no separate download needed. The dataset is synthetic and reproducible from a fixed random seed (42).
 
 ---
 
-## The Northgate dataset
+## The Northgate running case study
 
-| File generated | Rows | Description |
-|----------------|------|-------------|
-| `nb_transactions.csv` | 23,188 | All transactions, Jan–Dec 2023 |
-| `nb_customers.csv` | 500 | Customer and account records |
-| `nb_counterparties.csv` | 300 | Counterparty firms with country codes |
-| `nb_accounts.csv` | 500 | Account metadata |
+All notebooks share a single fictional dataset: Northgate Retail Bank, a mid-sized UK retail bank with 500 customer accounts. Six accounts are embedded mule accounts conducting structuring — repeated cash deposits just below the reporting threshold, transacting with high-risk counterparties.
 
-Six accounts (`ACC0001`–`ACC0006`) are embedded mule accounts with structuring behaviour: 3–8 cash deposits per month, each just below USD 10,000, transacting primarily with counterparties in high-risk jurisdictions. All data is **entirely synthetic**. Northgate Retail Bank does not exist.
+Each chapter adds one new analytical layer to the same case:
+
+| Chapter | What gets built |
+|---------|----------------|
+| 3 | Explore the raw data; trace the TM lifecycle |
+| 4 | Rule 1 — NRB-STRUCT-001 (cash structuring); 47 alerts generated |
+| 5 | Entity resolution — reveal that the 47 alerts include a coordinated 6-account mule network |
+| 6 | K-Means segmentation — peer groups for threshold calibration |
+| 7 | Rule 2 — NRB-VEL-002 (velocity); cross-rule overlap analysis |
+| 8 | Rule 3 — NRB-GEO-003 (high-risk countries); coverage matrix vs. FFIEC red flags |
+| 9 | Isolation Forest ML triage — all six mule accounts rank 1–6 by anomaly score |
+
+By the end of Chapter 9, students have built, segmented, tuned, assessed, and ML-triaged the same complete transaction monitoring system.
 
 ---
 
-## Three-rule detection system built across Chapters 4–8
+## Three-rule detection system
 
-| Rule ID | Chapter | Detection logic | Threshold |
-|---------|---------|-----------------|-----------|
+| Rule ID | Chapter | Detection logic | Key threshold |
+|---------|---------|-----------------|---------------|
 | NRB-STRUCT-001 | 4 | Rolling 30-day cash deposits | > USD 7,500, ≥ 3 transactions |
-| NRB-VEL-002 | 6 | Rapid-fire transactions in short window | ≥ 5 transactions in 14 days |
-| NRB-GEO-003 | 7 | Transactions with high-risk country counterparties | ≥ 2 transactions, ≥ USD 5,000 |
-
-Chapter 8 applies Isolation Forest across all accounts that trigger any of the three rules. All six mule accounts rank in positions 1–6 by anomaly score.
+| NRB-VEL-002 | 7 | Rapid-fire transactions in short window | ≥ 5 transactions in 14 days |
+| NRB-GEO-003 | 8 | Transactions with high-risk country counterparties | ≥ 2 transactions, ≥ USD 5,000 |
 
 ---
 
 ## For instructors
 
-Each notebook is structured in three sections:
+Each notebook is structured consistently:
 
-- **Section 0 — Setup:** dataset generation (run once, shared across all chapters)
-- **Section 1 — Colab Preview:** the exact code printed in the chapter's blue code box, producing identical output to what appears in the book
-- **Section 2 — Exercise Extension:** deeper analysis that extends the main-text example; structured with `✏️ YOUR OBSERVATION` prompts
-- **Section 3 — Reflection / Answer cells:** editable markdown cells for structured written answers
+- **Section 0 — Setup:** dataset generation (run once per session)
+- **Section 1 — Colab Preview:** the exact code printed in the chapter, producing identical output to the book
+- **Section 2+ — Exercise sections:** deeper analysis tied to numbered exercises in the text
+- **Reflection cells:** editable markdown cells for structured written answers
 
-Notebooks can be assigned directly — students click the badge, run Section 0, and work through the exercise without any local setup. Answer cells can be downloaded as `.ipynb` for submission.
+The `chapter_solutions.ipynb` notebook contains example answers for all reflection cells. It is intended for instructor use only.
 
 ---
 
 ## Corrections and updates
 
-If you find an error in a notebook, please open an issue at [github.com/ComplianceAnalytics/aml-book1/issues](https://github.com/ComplianceAnalytics/aml-book1/issues) or email corrections@complianceanalytics.co.uk.
-
-Because notebooks are hosted on GitHub, corrections appear immediately for all readers — no second edition required.
+If you find an error, please open an issue at [github.com/ComplianceAnalytics/aml-book1/issues](https://github.com/ComplianceAnalytics/aml-book1/issues) or email corrections@complianceanalytics.co.uk.
 
 ---
 
-*© Compliance Analytics Ltd. All dataset content is synthetic and fictional. No real customer, transaction, or financial data is included in this repository.*
+*© Compliance Analytics Ltd. All dataset content is synthetic and fictional. Northgate Retail Bank does not exist. No real customer, transaction, or financial data is included.*
